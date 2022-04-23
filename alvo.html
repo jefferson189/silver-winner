@@ -1,0 +1,114 @@
+<center><canvas width="600" height="600"></canvas>
+<p>Vidas:<span id="vidas"></span></p>
+<p>Pontuação <span id="pontos"></span></p>
+<p>acertos: <span id="acertos"></span></p>
+<p>velocidade: <span id="velocidade"></span></p>
+</center>
+
+<script>
+   // busca o elemento do HTML que receberá a pontuação do jogador
+    var areaQueExibePontos = document.querySelector('#pontos');
+    var areaQueExibeVidas = document.querySelector('#vidas');
+    var areaQueExibeAcertos = document.querySelector('#acertos');
+    var areaQueExibeVelocidade = document.querySelector('#velocidade');
+    var tela = document.querySelector('canvas');
+    var pincel = tela.getContext('2d');
+
+    pincel.fillStyle = 'lightgray';
+    pincel.fillRect(0, 0, 600, 600);
+
+    var raio = 10;
+    var xAleatorio;
+    var yAleatorio;
+    var pontos = 0;
+    var vidas = 3;
+    var velocidade = 2000;
+    var acertos = 0; 
+    var pontuacao;
+    var meuInterval = setInterval(atualizaTela, velocidade);
+
+    meuInterval;
+
+    function desenhaCirculo(x, y, raio, cor) {
+
+        pincel.fillStyle = cor;
+        pincel.beginPath();
+        pincel.arc(x, y, raio, 0, 2 * Math.PI);
+        pincel.fill();
+    }
+
+    function desenhaLetra(msg,x,y){
+        pincel.font='100px arial';
+        pincel.lineWidth=4;
+        pincel.fillStyle='blue';
+        pincel.fillText(msg, x, y)
+    }
+
+    function limpaTela() {
+        pincel.clearRect(0, 0, 600, 600);
+    }
+
+    function desenhaAlvo(x, y) {
+        desenhaCirculo(x, y, raio + 20, 'red');
+        desenhaCirculo(x, y, raio + 10, 'white');
+        desenhaCirculo(x, y, 10, 'red');
+    }
+
+    function posicaoAlvo(maximo) {
+
+        return Math.floor(Math.random() * maximo);
+
+    }
+
+    function atualizaTela(){
+        limpaTela();
+        xAleatorio = posicaoAlvo(600 - (raio + 50));
+        yAleatorio = posicaoAlvo(400 - (raio + 50));
+        desenhaAlvo(xAleatorio, yAleatorio);
+        areaQueExibeVidas.textContent = vidas;
+        dificuldaJogo();
+    }
+
+    function dificuldaJogo(){
+        pontuacao = (500000 / velocidade) * acertos;
+        if(acertos == 5){
+            velocidade -= 500;
+        }else if(acertos == 10){
+            velocidade -=500;
+        }else if(acertos == 15){
+            velocidade -= 500;
+        }else if(acertos == 20){
+            velocidade -= 100;
+        }
+    }
+
+
+function dispara(evento) {
+    var x = evento.pageX - tela.offsetLeft;
+    var y = evento.pageY - tela.offsetTop;
+        if ((x > xAleatorio - raio) 
+                && (x < xAleatorio + raio) 
+                && (y > yAleatorio - raio) 
+                && (y < yAleatorio + raio)) {
+            acertos++
+            pontuacao = (acertos * 50000) / velocidade;
+            pontos += pontuacao;
+            desenhaLetra("Acertou",120,500);
+            areaQueExibePontos.textContent = pontos; 
+            areaQueExibeAcertos.textContent = acertos;
+            areaQueExibeVelocidade.textContent = velocidade;
+        }else{
+            if(vidas>0){
+                vidas -= 1;
+                areaQueExibeVidas.textContent = vidas;
+            }else if(vidas == 0){
+                clearInterval(meuInterval);
+                pincel.clearRect(0, 0, 600, 600);
+                desenhaLetra("GameOver!",0,500);
+            }
+        }
+}
+
+    tela.onclick = dispara;  
+
+</script>
