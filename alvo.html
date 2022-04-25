@@ -17,18 +17,19 @@
     pincel.fillStyle = 'lightgray';
     pincel.fillRect(0, 0, 600, 600);
 
-    var raio = 10;
-    var xAleatorio;
-    var yAleatorio;
-    var pontos = 0;
-    var vidas = 3;
-    var velocidade = 2000;
-    var acertos = 0; 
-    var pontuacao;
-    var meuInterval = setInterval(atualizaTela, velocidade);
-
-    meuInterval;
-
+    var raio = 10; //Tamanho do circulo;
+    var xAleatorio; //X do Alvo;
+    var yAleatorio; //Y do Alvo;
+    var pontos = 0; // Pontuacao do jogador;
+    var vidas = 3; // Vidas do player;
+    var velocidade = 2000; //Velocidade que a tela ira atualizar;
+    var acertos = 1; // Acertos para multiplicação de pontos;
+    var meuInterval = setInterval(atualizaTela, velocidade); // Chama intervalos, atualiza area do canvas e escolho os segundos entre atualizacoes;
+    
+    function pontuacao(){
+    	pontos += acertos * 500;
+    }
+	
     function desenhaCirculo(x, y, raio, cor) {
 
         pincel.fillStyle = cor;
@@ -67,19 +68,30 @@
         desenhaAlvo(xAleatorio, yAleatorio);
         areaQueExibeVidas.textContent = vidas;
         dificuldaJogo();
+        pontuacao();
     }
 
     function dificuldaJogo(){
-        pontuacao = (500000 / velocidade) * acertos;
-        if(acertos == 5){
+    
+    var facil = acertos == 10;
+    var medio = acertos == 15;
+    var dificil = acertos == 20;
+    
+        if(facil){
+            clearInterval(meuInterval);
             velocidade -= 500;
-        }else if(acertos == 10){
-            velocidade -=500;
-        }else if(acertos == 15){
+            meuInterval = setInterval(atualizaTela, velocidade);                   
+        }else if(medio){
+            clearInterval(meuInterval);
+            velocidade -= 500; 
+            meuInterval = setInterval(atualizaTela, velocidade);
+        }/*else if(dificil){
+            clearInterval(meuInterval);
             velocidade -= 500;
-        }else if(acertos == 20){
-            velocidade -= 100;
+            meuInterval = setInterval(atualizaTela, velocidade);             
         }
+        */
+          
     }
 
 
@@ -91,11 +103,9 @@ function dispara(evento) {
                 && (y > yAleatorio - raio) 
                 && (y < yAleatorio + raio)) {
             acertos++
-            pontuacao = (acertos * 50000) / velocidade;
-            pontos += pontuacao;
             desenhaLetra("Acertou",120,500);
             areaQueExibePontos.textContent = pontos; 
-            areaQueExibeAcertos.textContent = acertos;
+            areaQueExibeAcertos.textContent = acertos - 1;
             areaQueExibeVelocidade.textContent = velocidade;
         }else{
             if(vidas>0){
@@ -108,7 +118,7 @@ function dispara(evento) {
             }
         }
 }
-
+    meuInterval;
     tela.onclick = dispara;  
 
 </script>
